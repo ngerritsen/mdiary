@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 const fs = require('fs');
 const showdown = require('showdown');
 const path = require('path');
@@ -17,13 +15,16 @@ Promise.all(pages.map(createPage))
   .then(() => console.log(`✅ Generated ${pages.length + 1} pages!`));
 
 async function createPage(page, index) {
-  const html = await ejs.renderFile('./templates/index.ejs', { page, sidebar });
+  const html = await ejs.renderFile(
+    path.join(__dirname, '../templates/index.ejs'),
+    { page, sidebar }
+  );
 
   return new Promise(resolve => {
-    fs.writeFile(`./dist/${page.id}.html`, html, resolve);
+    fs.writeFile(path.join(process.cwd(), `./dist/${page.id}.html`), html, resolve);
 
     if (index === 0) {
-      fs.writeFile(`./dist/index.html`, html, resolve);
+      fs.writeFile(path.join(process.cwd(), `./dist/index.html`), html, resolve);
     }
   });
 }
