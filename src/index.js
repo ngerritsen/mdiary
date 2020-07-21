@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const fs = require('fs');
 const showdown = require('showdown');
 const path = require('path');

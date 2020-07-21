@@ -1,6 +1,6 @@
 # mdiary
 
-📕 A static diary generator.
+A static diary generator. 📕
 
 ## Installation
 
@@ -19,4 +19,4 @@ Make sure to have the following folder structure:
   2020-07-13.md
 ```
 
-Then run `mdiary` from the root folder. It will create a `/dist` following folder next to pages. This is your diary website 😀.
+Then run `mdiary` from the root folder. It will create a `/dist` folder next to the `/pages` folder. This is your diary website 😀 .
