@@ -1,8 +1,11 @@
 {
   "name": "mdiary",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A static diary generator",
   "main": "src/generate.js",
+  "bin": {
+    "subshift": "src/generate.js"
+  },
   "scripts": {
     "generate": "npm run prepare; node ./src/generate",
     "serve": "http-server ./dist -c -1",
