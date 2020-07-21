@@ -1,53 +1,64 @@
-const fs = require('fs');
+const Promise = require('bluebird');
+const fs = Promise.promisifyAll(require('fs'));
+const del = require('del');
 const showdown = require('showdown');
 const path = require('path');
 const moment = require('moment');
 const ejs = require('ejs');
 
 const MARKDOWN_EXTENSION = '.md';
+const OUTPUT_DIR = 'dist';
+const INPUT_DIR = 'pages';
 
 moment.locale('nl');
 
-const pages = getPages();
-const sidebar = getSidebar(pages);
+run();
 
-Promise.all(pages.map(createPage))
-  .then(() => console.log(`✅ Generated ${pages.length + 1} pages!`));
+async function run() {
+  const pages = await getPages();
+  const sidebar = getSidebar(pages);
+  
+  await prepareOutputDir();
+  await Promise.all(pages.map((page, index) => createPage(page, index, sidebar)));
+  
+  console.log(`✅ Generated ${pages.length + 1} pages!`);
+}
 
-async function createPage(page, index) {
+async function createPage(page, index, sidebar) {
   const html = await ejs.renderFile(
     path.join(__dirname, '../templates/index.ejs'),
     { page, sidebar }
   );
 
-  return new Promise(resolve => {
-    fs.writeFile(path.join(process.cwd(), `./dist/${page.id}.html`), html, resolve);
+  await fs.writeFileAsync(getRelativePath(OUTPUT_DIR, `${page.id}.html`), html);
 
-    if (index === 0) {
-      fs.writeFile(path.join(process.cwd(), `./dist/index.html`), html, resolve);
-    }
-  });
+  if (index === 0) {
+    await fs.writeFileAsync(getRelativePath(OUTPUT_DIR, 'index.html'), html);
+  }
 }
 
-function getPages() {
-  const pageFilePaths = fs.readdirSync('./pages');
+async function getPages() {
+  const pageFilePaths = await fs.readdirAsync(getRelativePath(INPUT_DIR));
   const converter = new showdown.Converter();
   
-  return pageFilePaths
+  const pages = await Promise.all(pageFilePaths
     .filter(pageFilePath => path.extname(pageFilePath) === MARKDOWN_EXTENSION)
-    .map(pageFilePath => {
+    .map(async (pageFilePath) => {
       const rawDate = path.basename(pageFilePath, MARKDOWN_EXTENSION);
       const date = new Date(Date.parse(rawDate));
+      const html = await fs.readFileAsync(getRelativePath(INPUT_DIR, pageFilePath), 'utf-8');
 
       return {
-        html: converter.makeHtml(fs.readFileSync(path.join('./pages', pageFilePath), 'utf-8')),
+        html: converter.makeHtml(html),
         shortDate: moment(date).format('ll'),
         fullDate: moment(date).format('LL'),
         id: rawDate,
         slug: rawDate,
         date
       }
-    })
+    }));
+  
+    return pages
     .sort((a, b) => a.date - b.date)
     .reverse();
 }
@@ -72,4 +83,16 @@ function getSidebar(pages) {
       id
     }))
     .sort((a, b) => a.id < b.id);
+}
+
+async function prepareOutputDir() {
+  if ((await fs.readdirAsync(process.cwd())).includes(OUTPUT_DIR)) {
+    await del(getRelativePath(OUTPUT_DIR));
+  }
+
+  await fs.mkdirAsync(getRelativePath(OUTPUT_DIR));
+}
+
+function getRelativePath(...pathSegments) {
+  return path.join(process.cwd(), ...pathSegments);
 }
