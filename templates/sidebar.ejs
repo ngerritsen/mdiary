@@ -1,0 +1,28 @@
+<% sidebar.forEach((section, index) => { %>
+    <div class="mb-4">
+        <h6
+            class="cursor-pointer <%= index === 0 ? '' : 'dropright' %>"
+            data-collapsible-trigger="<%= section.id %>"
+        >
+            <span class="dropdown-toggle">
+                <%= section.title %>
+                <span class="badge badge-pill badge-secondary"><%= section.pages.length %></span>
+            </span>
+        </h6>
+        <ul
+            data-collapsible-content="<%= section.id %>"
+            class="nav flex-column nav-pills <%= index === 0 ? '' : 'd-none' %>"
+        >
+            <% section.pages.forEach((page) => { %>
+                <li class="nav-item">
+                    <a
+                        class="nav-link <%= currentPage.id === page.id ? 'active' : '' %>"
+                        href="/<%= page.slug %>.html"
+                    >
+                        <%= page.fullDate %>
+                    </a>
+                </li>
+            <% }); %>
+        </ul>
+    </div>
+<% }); %>

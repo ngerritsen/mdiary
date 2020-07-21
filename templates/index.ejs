@@ -1,0 +1,35 @@
+<meta name="robots" content="index,follow" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Dagboek - <%= page.title %></title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+<nav class="navbar navbar-light bg-light">
+    <div class="container-lg">
+        <a class="navbar-brand" href="/">
+            📕 &nbsp; Dagboek
+        </a>
+        <button
+            class="navbar-toggler d-md-none"
+            type="button"
+            data-hamburger-trigger
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</nav>
+
+<div class="container-lg mt-4">
+    <div class="row">
+        <div class="col-12 d-none d-md-block col-md-4 col-lg-3" data-hamburger-content>
+            <%- include('sidebar', { sidebar, currentPage: page }); %>
+            <hr class="d-md-none"/>
+        </div>
+        <div class="col-12 col-md-8 col-lg-9">
+            <p class="text-secondary"><%= page.fullDate %></p>
+            <%- page.html %>
+        </div>
+    </div>
+</div>
+
+<%- include('client'); %>

@@ -1,0 +1,36 @@
+<style>
+  .cursor-pointer {
+    cursor: pointer;
+  }
+</style>
+
+<script>
+function collapsibleSideBar() {
+  queryAll('[data-collapsible-trigger]').forEach(function (trigger) {
+    trigger.addEventListener('click', function (event) {
+      const id = trigger.getAttribute('data-collapsible-trigger');
+      const content = query('[data-collapsible-content="' + id + '"]');
+
+      event.currentTarget.classList.toggle('dropright');
+      content.classList.toggle('d-none');
+    });
+  });
+}
+
+function hamburgerMenu() {
+  query('[data-hamburger-trigger]').addEventListener('click', function (event) {
+    query('[data-hamburger-content]').classList.toggle('d-none');
+  });
+}
+
+function query(queryString) {
+  return document.querySelector(queryString);
+}
+
+function queryAll(queryString) {
+  return Array.prototype.slice.call(document.querySelectorAll(queryString));
+}
+
+collapsibleSideBar();
+hamburgerMenu();
+</script>
