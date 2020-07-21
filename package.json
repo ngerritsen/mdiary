@@ -1,6 +1,6 @@
 {
   "name": "mdiary",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A static diary generator",
   "main": "src/index.js",
   "bin": {
