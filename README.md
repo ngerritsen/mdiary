@@ -27,12 +27,17 @@ You can provide several options to customize the generation:
 
 ```
 Options:
-  --help        Show help                                              [boolean]
-  --version     Show version number                                    [boolean]
-  --locale, -l  The locale to be used for showing dates          [default: "en"]
-  --title, -t   The title of your diary                       [default: "Diary"]
-  --input, -i   The input folder containing markdown files    [default: "pages"]
-  --output, -o  The output folder for the generated html       [default: "dist"]
+  --help         Show help                                             [boolean]
+  --version      Show version number                                   [boolean]
+  --locale, -l   The locale to be used for showing dates         [default: "en"]
+  --title, -t    The title of your diary                      [default: "Diary"]
+  --input, -i    The input folder containing markdown files   [default: "pages"]
+  --output, -o   The output folder for the generated html      [default: "dist"]
+  --serve, -s    Serve a preview of the diary on localhost
+                                                      [boolean] [default: false]
+  --watch, -w    Watch the input folder for changes and re-generate whenever a
+                 change is made                       [boolean] [default: false]
+  --verbose, -v  Show more verbose command line output[boolean] [default: false]
 ```
 
 ## Local use

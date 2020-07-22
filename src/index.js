@@ -6,6 +6,8 @@ const path = require('path');
 const moment = require('moment');
 const ejs = require('ejs');
 const yargs = require('yargs');
+const express = require('express');
+const watchlist = require('watchlist');
 
 const MARKDOWN_EXTENSION = '.md';
 
@@ -31,6 +33,24 @@ const argv = yargs
     describe: 'The output folder for the generated html',
     default: 'dist'
   })
+  .option('serve', {
+    alias: 's',
+    describe: 'Serve a preview of the diary on localhost',
+    default: false
+  })
+  .boolean('serve')
+  .option('watch', {
+    alias: 'w',
+    describe: 'Watch the input folder for changes and re-generate whenever a change is made',
+    default: false
+  })
+  .boolean('watch')
+  .option('verbose', {
+    alias: 'v',
+    describe: 'Show more verbose command line output',
+    default: false
+  })
+  .boolean('verbose')
   .argv
 
 moment.locale(argv.locale);
@@ -38,13 +58,25 @@ moment.locale(argv.locale);
 run();
 
 async function run() {
+  await generate();
+  
+  if (argv.serve) {
+    await serve();
+  }
+
+  if (argv.watch) {
+    await watch();
+  }
+}
+
+async function generate() {
   const pages = await getPages();
   const sidebar = getSidebar(pages);
   
   await prepareOutputDir();
   await Promise.all(pages.map((page, index) => createPage(page, index, sidebar)));
   
-  console.log(`✅ Generated ${pages.length + 1} pages!`);
+  console.log(`Generated ${pages.length + 1} pages!`);
 }
 
 async function createPage(page, index, sidebar) {
@@ -53,10 +85,18 @@ async function createPage(page, index, sidebar) {
     { page, sidebar, title: argv.title }
   );
 
-  await fs.writeFileAsync(getRelativePath(argv.output, `${page.id}.html`), html);
+  await writeOutputFile(`${page.id}.html`, html);
 
   if (index === 0) {
-    await fs.writeFileAsync(getRelativePath(argv.output, 'index.html'), html);
+    await writeOutputFile('index.html', html);
+  }
+}
+
+async function writeOutputFile(fileName, content) {
+  await fs.writeFileAsync(getRelativePath(argv.output, fileName), content);
+
+  if (argv.verbose) {
+    console.log(`Written ${argv.output}/${fileName}.`);
   }
 }
 
@@ -114,6 +154,30 @@ async function prepareOutputDir() {
   }
 
   await fs.mkdirAsync(getRelativePath(argv.output));
+}
+
+function serve() {
+  const app = express();
+
+  app.use(express.static(getRelativePath(argv.output)))
+
+  return new Promise(resolve => {
+    app.listen(8080, err => {
+      if (err) {
+        reject (err);
+        return;
+      }
+
+      console.log(`Serving ${argv.title} on http://localhost:8080`);
+      resolve();
+    });
+  });
+}
+
+async function watch() {
+  watchlist.watch([argv.input], generate, { cwd: process.cwd() });
+
+  console.log('Watching for changes...');
 }
 
 function getRelativePath(...pathSegments) {
