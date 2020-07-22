@@ -1,7 +1,8 @@
 <% sidebar.forEach((section, index) => { %>
+    <% const isExpanded = !!section.pages.find(p => p.id === currentPage.id); %>
     <div class="mb-4">
         <h6
-            class="cursor-pointer <%= index === 0 ? '' : 'dropright' %>"
+            class="cursor-pointer <%= isExpanded ? '' : 'dropright' %>"
             data-collapsible-trigger="<%= section.id %>"
         >
             <span class="dropdown-toggle">
@@ -11,7 +12,7 @@
         </h6>
         <ul
             data-collapsible-content="<%= section.id %>"
-            class="nav flex-column nav-pills <%= index === 0 ? '' : 'd-none' %>"
+            class="nav flex-column nav-pills <%= isExpanded ? '' : 'd-none' %>"
         >
             <% section.pages.forEach((page) => { %>
                 <li class="nav-item">

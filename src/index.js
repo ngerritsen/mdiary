@@ -5,12 +5,35 @@ const showdown = require('showdown');
 const path = require('path');
 const moment = require('moment');
 const ejs = require('ejs');
+const yargs = require('yargs');
 
 const MARKDOWN_EXTENSION = '.md';
-const OUTPUT_DIR = 'dist';
-const INPUT_DIR = 'pages';
 
-moment.locale('nl');
+const argv = yargs
+  .scriptName('mdiary')
+  .option('locale', {
+    alias: 'l',
+    describe: 'The locale to be used for showing dates',
+    default: 'en'
+  })
+  .option('title', {
+    alias: 't',
+    describe: 'The title of your diary',
+    default: 'Diary'
+  })
+  .option('input', {
+    alias: 'i',
+    describe: 'The input folder containing markdown files',
+    default: 'pages'
+  })
+  .option('output', {
+    alias: 'o',
+    describe: 'The output folder for the generated html',
+    default: 'dist'
+  })
+  .argv
+
+moment.locale(argv.locale);
 
 run();
 
@@ -27,18 +50,18 @@ async function run() {
 async function createPage(page, index, sidebar) {
   const html = await ejs.renderFile(
     path.join(__dirname, '../templates/index.ejs'),
-    { page, sidebar }
+    { page, sidebar, title: argv.title }
   );
 
-  await fs.writeFileAsync(getRelativePath(OUTPUT_DIR, `${page.id}.html`), html);
+  await fs.writeFileAsync(getRelativePath(argv.output, `${page.id}.html`), html);
 
   if (index === 0) {
-    await fs.writeFileAsync(getRelativePath(OUTPUT_DIR, 'index.html'), html);
+    await fs.writeFileAsync(getRelativePath(argv.output, 'index.html'), html);
   }
 }
 
 async function getPages() {
-  const pageFilePaths = await fs.readdirAsync(getRelativePath(INPUT_DIR));
+  const pageFilePaths = await fs.readdirAsync(getRelativePath(argv.input));
   const converter = new showdown.Converter();
   
   const pages = await Promise.all(pageFilePaths
@@ -46,7 +69,7 @@ async function getPages() {
     .map(async (pageFilePath) => {
       const rawDate = path.basename(pageFilePath, MARKDOWN_EXTENSION);
       const date = new Date(Date.parse(rawDate));
-      const html = await fs.readFileAsync(getRelativePath(INPUT_DIR, pageFilePath), 'utf-8');
+      const html = await fs.readFileAsync(getRelativePath(argv.input, pageFilePath), 'utf-8');
 
       return {
         html: converter.makeHtml(html),
@@ -86,11 +109,11 @@ function getSidebar(pages) {
 }
 
 async function prepareOutputDir() {
-  if ((await fs.readdirAsync(process.cwd())).includes(OUTPUT_DIR)) {
-    await del(getRelativePath(OUTPUT_DIR));
+  if ((await fs.readdirAsync(process.cwd())).includes(argv.output)) {
+    await del(getRelativePath(argv.output));
   }
 
-  await fs.mkdirAsync(getRelativePath(OUTPUT_DIR));
+  await fs.mkdirAsync(getRelativePath(argv.output));
 }
 
 function getRelativePath(...pathSegments) {
