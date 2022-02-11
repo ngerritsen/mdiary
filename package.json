@@ -1,6 +1,6 @@
 {
   "name": "mdiary",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A static diary generator",
   "main": "src/index.js",
   "bin": {
@@ -14,14 +14,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ngerritsen/dagboek.git"
+    "url": "git+https://gitlab.com/ngerritsen/dagboek.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ngerritsen/dagboek/issues"
+    "url": "https://gitlab.com/ngerritsen/dagboek/issues"
   },
-  "homepage": "https://github.com/ngerritsen/dagboek#readme",
+  "homepage": "https://gitlab.com/ngerritsen/dagboek#readme",
   "dependencies": {
     "bluebird": "^3.7.2",
     "del": "^5.1.0",
